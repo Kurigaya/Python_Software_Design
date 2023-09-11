@@ -131,11 +131,11 @@ class HasCoin(State):
         print("Finished!!! Here is your coffee.")
         self.coffeeMachine.setState(self.coffeeMachine.release)
     def takeCoffee(self):
-        pass
+        print("...")
     def takeCoinBack(self):
-        pass
+        print("...")
     def refill(self):
-        pass
+        print("...")
 
 class ReleaseCoffee(State):
     def __init__(self, coffeeMachine: CoffeeMachine):
@@ -160,17 +160,17 @@ class SoldOut(State):
     def __init__(self, coffeeMachine: CoffeeMachine):
         self.coffeeMachine = coffeeMachine
     def selectMenu(self):
-        pass
+        print("No coffee today.")
     def confirmMenu(self):
-        pass
+        print("No coffee today.")
     def insertCoin(self):
-        pass
+        print("No coffee today.")
     def turnCrank(self):
-        pass
+        print("No coffee today.")
     def takeCoffee(self):
-        pass
+        print("No coffee today.")
     def takeCoinBack(self):
-        pass
+        print("No coffee today.")
     def refill(self, ingred, quan):
         self.refill(ingred, quan)
 
