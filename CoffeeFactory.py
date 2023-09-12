@@ -8,7 +8,7 @@ class Coffee(ABC):
         pass
     def cost(self):
         pass
-    def ingred(self):
+    def getIngred(self):
         pass
 
 #Decorator
@@ -82,7 +82,7 @@ class HouseBlend(Coffee):
         return self.coffee
     def cost(self):
         return 0.89
-    def ingred(self):
+    def getIngred(self):
         return self.ingred
 
 #Menu
@@ -104,7 +104,7 @@ class Late(Coffee):
     def coffeeName(self):
         return self.coffee
     def cost(self):
-        return self.coffee.cost()
+        return self.bev.cost()
     def getIngred(self):
         return self.bev.getIngred()
 
@@ -116,7 +116,7 @@ class MochaLate(Coffee):
     def coffeeName(self):
         return self.coffee
     def cost(self):
-        return self.coffee.cost()
+        return self.bev.cost()
     def getIngred(self):
         return self.bev.getIngred()
 
@@ -165,11 +165,18 @@ class Inventory:
                             "DarkRoast": 1000,
                             "HouseBlend": 1000}
     
-    def takeIngred(self, ingred, quan):
-        if ingred in self.Ingredients and self.Ingredients[ingred] >= quan:
+    def enoughIngred(self, ingreds):
+        for ingred in ingreds:
+            quan = ingreds[ingred]
+            if ingred in self.Ingredients and self.Ingredients[ingred] >= quan:
+                pass
+            else:
+                return False
+        return True
+    def takeIngreds(self, ingreds):
+        for ingred in ingreds:
+            quan = ingreds[ingred]
             self.Ingredients[ingred] -= quan
-        else:
-            print(f"Not enough {ingred}")
     def refillIngred(self, ingred, quan):
         self.Ingredients[ingred] += quan
     def checkIngred(self):
@@ -206,12 +213,8 @@ class CoffeeMachine(Inventory):
         self.state.takeCoffee()
     def takeCoinBack(self):
         self.state.takeCoinBack()
-    def refill(self):
-        self.state.refill()
-    def takeIngreds(self, ingreds):
-        for ingred in ingreds:
-            quan = ingreds[ingred]
-            self.takeIngred(ingred, quan)
+    def refill(self, ingred, quan):
+        self.state.refill(ingred, quan)
 
 class WaitForOrder(State):
     def __init__(self, coffeeMachine: CoffeeMachine):
@@ -233,10 +236,13 @@ class WaitForOrder(State):
             if beverage in factories:
                 factory = factories[beverage]
                 self.coffeeMachine.bev = factory.brewCoffee()
-                self.coffeeMachine.takeIngreds(self.coffeeMachine.bev.getIngred())
-                print(f"You selected: {self.coffeeMachine.bev.coffeeName()}")
-                print(f"It needed {self.coffeeMachine.bev.getIngred()}")
-                break
+                if self.coffeeMachine.enoughIngred(self.coffeeMachine.bev.getIngred()):
+                    self.coffeeMachine.takeIngreds(self.coffeeMachine.bev.getIngred())
+                    print(f"You selected: {self.coffeeMachine.bev.coffeeName()} ${self.coffeeMachine.bev.cost()}")
+                    print(f"It needed {self.coffeeMachine.bev.getIngred()}")
+                    break
+                else:
+                    print("Not enough ingredients to brew this menu, pls choose another one.")
             else:
                 print("Invalid choice!")
 
@@ -250,7 +256,7 @@ class WaitForOrder(State):
         print("Confirm your order first!")
     def takeCoinBack(self):
         print("You didn't insert any coin!")
-    def refill(self):
+    def refill(self, ingred, quan):
         print("You cannot refill!")
 
 
@@ -271,26 +277,26 @@ class HasCoin(State):
         print("...")
     def takeCoinBack(self):
         print("...")
-    def refill(self):
+    def refill(self, ingred, quan):
         print("...")
 
 class ReleaseCoffee(State):
     def __init__(self, coffeeMachine: CoffeeMachine):
         self.coffeeMachine = coffeeMachine
     def selectMenu(self):
-        print("Wait for finish your coffee first.")
+        print("Take your coffee first.")
     def confirmMenu(self):
-        print("You have confirm already, pls wait.")
+        print("You have confirm already, pls take your coffee.")
     def insertCoin(self):
         print("Thank for tips")
     def turnCrank(self):
-        print("Wait")
+        print("You have turned crank already.")
     def takeCoffee(self):
         print("Thank you!! see you later.")
         self.coffeeMachine.setState(self.coffeeMachine.waitForOrder)
     def takeCoinBack(self):
         print("Only take coffee pls.")
-    def refill(self):
+    def refill(self, ingred, quan):
         print("No refill at the moment.")
 
 class SoldOut(State):
@@ -309,16 +315,18 @@ class SoldOut(State):
     def takeCoinBack(self):
         print("No coffee today.")
     def refill(self, ingred, quan):
-        self.refill(ingred, quan)
+        self.refillIngred(ingred, quan)
 def main():
     coffeeMachine = CoffeeMachine()
     coffeeMachine.selectMenu()
+    coffeeMachine.confirmMenu()
+    coffeeMachine.insertCoin()
+    coffeeMachine.turnCrank()
     coffeeMachine.checkIngred()
     coffeeMachine.selectMenu()
     coffeeMachine.checkIngred()
-    # coffeeFactory = CuppuccinoFactory().brewCoffee()
-    # print(f"Your coffee is {coffeeFactory.coffeeName()} at ${coffeeFactory.cost()}")
-    # coffeeFactory2 = LateFactory().brewCoffee()
-    # print(f"Second coffee is {coffeeFactory2.coffeeName()}")
+    coffeeMachine.refill("Chocolate", 80)
+    coffeeMachine.takeCoffee()
+    
 
 main()
