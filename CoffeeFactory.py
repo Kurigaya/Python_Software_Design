@@ -24,7 +24,7 @@ class Milk(Coffee):
         ingredients = self.coffee.getIngred().copy()  # Copy the base ingredients
         ingredients.update(self.ingred)  # Update with Milk ingredient
         return ingredients
-    
+
 class SoyMilk(Coffee):
     def __init__(self, coffee):
         self.coffee = coffee
@@ -73,7 +73,7 @@ class DarkRoast(Coffee):
         return 0.99
     def getIngred(self):
         return self.ingred
-    
+
 class HouseBlend(Coffee):
     def __init__(self) -> None:
         self.coffee = "HouseBlend"
@@ -108,7 +108,7 @@ class Late(Coffee):
     def getIngred(self):
         return self.bev.getIngred()
 
-    
+
 class MochaLate(Coffee):
     def __init__(self):
         self.coffee = "Mocha Late"
@@ -121,20 +121,16 @@ class MochaLate(Coffee):
         return self.bev.getIngred()
 
 #Creator Interfaces
-class CoffeeFactory(ABC):
-    def brewCoffee(self):
-        pass
+class CoffeeFactory():
+    def brewCoffee(self, coffee):
+        if coffee == "Cuppuccino":
+            return Cuppuccino()
+        elif coffee == "Late":
+            return Late()
+        elif coffee == "Mocha Late":
+            return MochaLate()
+        return False
 
-#Concrete Creators
-class CuppuccinoFactory(CoffeeFactory):
-    def brewCoffee(self):
-        return Cuppuccino()
-class LateFactory(CoffeeFactory):
-    def brewCoffee(self):
-        return Late()
-class MochaLateFactory(CoffeeFactory):
-    def brewCoffee(self):
-        return MochaLate()
 
 #Interfaces for Coffee Machine
 class State():
@@ -164,7 +160,7 @@ class Inventory:
                             "SoyMilk": 5000,
                             "DarkRoast": 1000,
                             "HouseBlend": 1000}
-    
+
     def enoughIngred(self, ingreds):
         for ingred in ingreds:
             quan = ingreds[ingred]
@@ -189,15 +185,16 @@ class CoffeeMachine(Inventory):
     hasCoin = None
     release = None
     soldOut = None
-    
-    def __init__(self) -> None:
+
+    def __init__(self, current) -> None:
         super().__init__()
         self.waitForOrder = WaitForOrder(self)
         self.hasCoin = HasCoin(self)
         self.release = ReleaseCoffee(self)
         self.soldOut = SoldOut(self)
         self.setState(self.waitForOrder)
-
+        if current == 0:
+          self.setState(self.soldOut)
     def setState(self, state):
         self.state = state
 
@@ -228,21 +225,17 @@ class WaitForOrder(State):
         while True:
             beverage = input("Enter your coffee (1/2/3): ")
             factories = {
-            '1': CuppuccinoFactory(),
-            '2': LateFactory(),
-            '3': MochaLateFactory(),  # Assuming Mocha Late uses DarkRoast as a base
+            '1': "Cuppuccino",
+            '2': "Late",
+            '3': "MochaLate",
             }
-
+            factory = CoffeeFactory()
             if beverage in factories:
-                factory = factories[beverage]
-                self.coffeeMachine.bev = factory.brewCoffee()
-                if self.coffeeMachine.enoughIngred(self.coffeeMachine.bev.getIngred()):
-                    self.coffeeMachine.takeIngreds(self.coffeeMachine.bev.getIngred())
-                    print(f"You selected: {self.coffeeMachine.bev.coffeeName()} ${self.coffeeMachine.bev.cost()}")
-                    print(f"It needed {self.coffeeMachine.bev.getIngred()}")
-                    break
-                else:
-                    print("Not enough ingredients to brew this menu, pls choose another one.")
+                self.coffeeMachine.bev = factory.brewCoffee(factories[beverage])
+                self.coffeeMachine.takeIngreds(self.coffeeMachine.bev.getIngred())
+                print(f"You selected: {self.coffeeMachine.bev.coffeeName()}")
+                print(f"It needed {self.coffeeMachine.bev.getIngred()}")
+                break
             else:
                 print("Invalid choice!")
 
@@ -317,16 +310,18 @@ class SoldOut(State):
     def refill(self, ingred, quan):
         self.refillIngred(ingred, quan)
 def main():
-    coffeeMachine = CoffeeMachine()
+    coffeeMachine = CoffeeMachine(1) #parameter can be any except 0 for init coffee machine
     coffeeMachine.selectMenu()
     coffeeMachine.confirmMenu()
     coffeeMachine.insertCoin()
     coffeeMachine.turnCrank()
     coffeeMachine.checkIngred()
     coffeeMachine.selectMenu()
-    coffeeMachine.checkIngred()
     coffeeMachine.refill("Chocolate", 80)
     coffeeMachine.takeCoffee()
-    
+    print("------------------------")
+    coffeeMachine2 = CoffeeMachine(0) #Set state to SoldOut state
+    coffeeMachine2.selectMenu()
+
 
 main()
