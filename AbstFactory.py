@@ -342,15 +342,15 @@ class WaitForOrder(State):
                 menus = {
                     '1': "Cuppuccino",
                     '2': "Late",
-                    '3': "MochaLate",
+                    '3': "Mocha Late",
                     '4': "Custom coffee"
                 }
                 factory = CoffeeFactory()
                 if beverage in menus:
-                    self.bev = factory.brew(menus[beverage])
-                    self.coffeeMachine.takeIngreds(self.bev.getIngred())
-                    print(f"You selected: {self.bev.bevName()}")
-                    print(f"It needed {self.bev.getIngred()}")
+                    self.coffeeMachine.bev = factory.brew(menus[beverage])
+                    self.coffeeMachine.takeIngreds(self.coffeeMachine.bev.getIngred())
+                    print(f"You selected: {self.coffeeMachine.bev.bevName()}")
+                    print(f"It needed {self.coffeeMachine.bev.getIngred()}")
                     break
                 else:
                     print("Invalid choice!")
@@ -366,17 +366,16 @@ class WaitForOrder(State):
                 }
                 factory = TeaFactory()
                 if beverage in menus:
-                    self.bev = factory.brew(menus[beverage])
-                    self.coffeeMachine.takeIngreds(self.bev.getIngred())
-                    print(f"You selected: {self.bev.bevName()}")
-                    print(f"It needed {self.bev.getIngred()}")
+                    self.coffeeMachine.bev = factory.brew(menus[beverage])
+                    self.coffeeMachine.takeIngreds(self.coffeeMachine.bev.getIngred())
+                    print(f"You selected: {self.coffeeMachine.bev.bevName()}")
+                    print(f"It needed {self.coffeeMachine.bev.getIngred()}")
                     break
                 else:
                     print("Invalid choice!")
 
-
     def confirmMenu(self):
-        print(f"Insert coin for {self.bev.cost()}")
+        print(f"Insert coin for {self.coffeeMachine.bev.cost()}")
     def insertCoin(self):
         self.coffeeMachine.setState(self.coffeeMachine.hasCoin)
     def turnCrank(self):
