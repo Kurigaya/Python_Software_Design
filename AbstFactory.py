@@ -197,11 +197,11 @@ class CoffeeFactory(IBevFactory):
             while True:
                 dec = input("Which add-on you prefer (1/2/3/4/5/ 6 for No)")
                 decs = {
-                    '1': Milk(),
-                    '2': Iced(),
-                    '3': Chocolate(),
-                    '4': SoyMilk(),
-                    '5': Whip()
+                    '1': Milk,
+                    '2': Iced,
+                    '3': Chocolate,
+                    '4': SoyMilk,
+                    '5': Whip
                 }
                 if dec in decs:
                     decorator = decs[dec]
@@ -234,9 +234,9 @@ class TeaFactory(IBevFactory):
             while True:
                 dec = input("Which add-on you prefer (1/2/3/ 4 for No)")
                 decs = {
-                    '1': Milk(),
-                    '2': Iced(),
-                    '3': Lemon()
+                    '1': Milk,
+                    '2': Iced,
+                    '3': Lemon
                 }
                 if dec in decs:
                     decorator = decs[dec]
@@ -268,7 +268,8 @@ class State(ABC):
 
 class Inventory:
     def __init__(self) -> None:
-        self.Ingredients = {"Chocolate": 500,
+        self.Ingredients = {"Coffee": 500,
+                            "Chocolate": 500,
                             "Milk": 500,
                             "SoyMilk": 500,
                             "DarkRoast": 100,
@@ -277,7 +278,8 @@ class Inventory:
                             "BlackTea": 100,
                             "WhiteTea": 100,
                             "Lemon": 200,
-                            "Iced": 500
+                            "Iced": 500,
+                            "Whip": 300
                             }
 
     def enoughIngred(self, ingreds):
